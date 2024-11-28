@@ -1,11 +1,17 @@
+///Слайдер с картинками сверху. 
+///Слушает клик и проверяет класс: Если hat__slide, значит карточка закрыта и откроется по клику, при этом класс изменится на hat__slide active
+///Если класс hat__slide active, то повторный клик закроет слайдер
+
 const slides = document.querySelectorAll('.hat__slide');
 
         for (const hat__slide of slides) {
             hat__slide.addEventListener('click', () => {
+            if (hat__slide.className == 'hat__slide'){  
                 clearActiveClasses()
-                hat__slide.classList.add('active')
+                hat__slide.classList.add('active')}
+                else clearActiveClasses()
             })
-
+             
     function clearActiveClasses() {
         slides.forEach((hat__slide) => {
             hat__slide.classList.remove('active')
@@ -34,7 +40,7 @@ let winindex = [
 
 
 
-for(let i = 0; i<=8; i++) {
+for(let i = 1; i<=9; i++) {
     area.innerHTML += "<div class = 'cell' pos=" + i + "></div>";
 }
 

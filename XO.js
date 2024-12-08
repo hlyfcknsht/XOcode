@@ -1,121 +1,68 @@
-///Слайдер с картинками сверху. 
-///Слушает клик и проверяет класс: Если hat__slide, значит карточка закрыта и откроется по клику, при этом класс изменится на hat__slide active
-///Если класс hat__slide active, то повторный клик закроет слайдер
+let player = null; // Текущий игрок
+const winCombos = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+];
 
-const slides = document.querySelectorAll('.hat__slide');
+document.getElementById("playerX").addEventListener("click", () => startGame("X"));
+document.getElementById("playerO").addEventListener("click", () => startGame("O"));
+document.getElementById("reload").addEventListener("click", resetGame);
 
-        for (const hat__slide of slides) {
-            hat__slide.addEventListener('click', () => {
-            if (hat__slide.className == 'hat__slide'){  
-                clearActiveClasses()
-                hat__slide.classList.add('active')}
-                else clearActiveClasses()
-            })
-             
-    function clearActiveClasses() {
-        slides.forEach((hat__slide) => {
-            hat__slide.classList.remove('active')
-        })
-}}
+function startGame(selectedPlayer) {
+    player = selectedPlayer;
+    document.getElementById("playerPicker").style.display = "none";
+    document.getElementById("game").style.display = "block";
 
+    const area = document.getElementById("area");
+    area.innerHTML = ""; // Очистка игрового поля
 
-let area = document.getElementById('area');
-let cell = document.getElementsByClassName('cell');
-let currentPlayer = document.getElementById('curPlyr');
-let player = "X";
-
-
-
-let winindex = [
-    [1,2,3],
-    [4,5,6],
-    [7,8,9],
-    [1,4,7],
-    [2,5,8],
-    [3,6,9],
-    [1,5,9],
-    [3,5,7],
-]
-
-
-
-
-for(let i = 1; i<=9; i++) {
-    area.innerHTML += "<div class = 'cell' pos=" + i + "></div>";
+    for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.dataset.index = i;
+        cell.addEventListener("click", handleCellClick, { once: true });
+        area.appendChild(cell);
+    }
 }
 
-for(let i = 0; i < cell.length; i++) {
-    cell[i].addEventListener('click', cellClick, false);
+function handleCellClick() {
+    this.textContent = player;
 
-}
-
-function cellClick() {
-    let data = [];
-
-
-    if(!this.innerHTML){
-        this.innerHTML = player;
-    }else {
-        let alert = push.alert('AAAAA')
+    if (checkWin(player)) {
+        setTimeout(() => alert(`${player} победил!`), 100);
+        resetGame();
         return;
     }
-    
-    for(let i in cell) {
-        if(cell[i].innerHTML == player){
-            data.push(parseInt(cell[i].getAttribute('pos')));
 
-        }
+    if (checkDraw()) {
+        setTimeout(() => alert("Ничья!"), 100);
+        resetGame();
+        return;
     }
-    
-   
-    
-    if(winCheck(data)) {
-        restart(player + " победили!");
-    }else {
-        let draw = true;
-        for(let i in cell) {
-            if(cell[i].innerHTML == '') draw = false;
-        }
-        if(draw) {
-            restart("Ничья!")
-            
 
-        }
-    }
-    player = player == "X" ? "O" : "X";
-    currentPlayer.innerHTML = playerName;
-
+    player = player === "X" ? "O" : "X";
 }
 
+function checkWin(currentPlayer) {
+    const cells = [...document.querySelectorAll(".cell")];
+    const playerMoves = cells
+        .map((cell, index) => (cell.textContent === currentPlayer ? index : null))
+        .filter(index => index !== null);
 
-
-
-function winCheck(data) {
-    for(let i in winindex) {
-        let win = true;
-        for(let j in winindex[i]) {
-            let id = winindex[i][j];
-            let ind = data.indexOf(id);
-        
-           if(ind == -1) {
-            win = false;
-            }
-        }
-        if(win) return true;
-
-    }
-    return false;
+    return winCombos.some(combo => combo.every(index => playerMoves.includes(index)));
 }
-function restart(text) {
-alert(text);
-for(let i = 0; i < cell.length; i++) {
-cell[i].innerHTML = '';
-}}
-            
 
-let rest = document.getElementsByClassName('basement__repeat-button');
-if (rest) {
-    rest[0].addEventListener("click", function(){
-        location.reload();
-});
+function checkDraw() {
+    return [...document.querySelectorAll(".cell")].every(cell => cell.textContent);
+}
+
+function resetGame() {
+    document.getElementById("playerPicker").style.display = "block";
+    document.getElementById("game").style.display = "none";
 }
